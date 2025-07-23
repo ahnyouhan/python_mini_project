@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>피트니스 아이템 검색기</title>
+    <style>
+        @font-face {
+            font-family: '배달의민족 주아';
+            src: url('static/fonts/BMJUA_ttf.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            background-color: #5170ff;
+            display: flex;
+            flex-direction: column;
+            /* 위에서 아래로 쌓기 */
+            justify-content: center-start;
+            /* 위쪽 정렬 */
+            align-items: center;
+            /* 가로 가운데 정렬 */
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: '배달의민족 주아', sans-serif;
+        }
+
+        header {
+            margin-top: 40px;
+            color: white;
+            font-size: 5.5em;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            user-select: none; /* 텍스트 드래그 방지 */
+        }
+
+        .search-wrapper {
+            margin-top: 40px;
+            margin-left: 67px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 80%;
+            max-width: 700px;
+            background-color: white;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            padding: 10px;
+            border-radius: 15px;
+            /* 원처럼 너무 둥글면 줄이기 */
+            border: none;
+            
+            
+        }
+
+        /* 아이콘스타일 */
+        .icon{
+            width: 100px;
+            height: 50px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            margin-right: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            color: #5170ff;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.2s ease;
+        }
+
+        /* 마우스 위에 올렸을때 효과 적용 */
+        .icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
+        }
+
+        .icon img {
+            width: 48px;
+            height: 48px;
+            border-radius: 15px;
+            object-fit: cover;
+        }
+
+        /* 검색창 */
+        input[type="search"] {
+            width: 100%;
+            padding: 14px 24px;
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            font-size: 1.3em;
+            outline: none;
+            transition: box-shadow 0.2s ease;
+            font-family: '배달의민족 주아', sans-serif;
+        }
+
+        /* 검색창 눌렀을때 검색창 그림자 적용 */
+        input[type="search"]:focus {
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
+        }
+
+        /* 상품 카드 */
+        .product-row {
+            margin-top: 120px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: nowrap;
+            padding: 0 20px;
+            user-select: none;
+        }
+
+        .product-card {
+            background-color: white;
+            border-radius: 15px;
+            width: 300px;
+            height: 450PX;
+            padding: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 18px;
+            /* box-sizing: border-box; */
+            font-family: '배달의민족 주아', sans-serif;
+            gap: 12px;
+
+            text-align: center;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .product-card:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
+        }
+
+        .product-card-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 10px;
+        }
+
+        .product-info {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        .product-name {
+            font-size: 25px;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;         /* 최대 2줄까지 표시 */
+            -webkit-box-orient: vertical;
+            overflow: hidden; 
+        }
+
+        .product-price {
+            font-size: 30px;
+            color: #5170ff;
+        }
+
+        /* 페이지 */
+        .pagination {
+            margin-top: 90px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .page-number {
+            padding: 6px 12px;
+            background-color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            user-select: none;
+            transition: transform 0.2s ease;
+        }
+        .page-number:hover {
+            transform: scale(1.2);          
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
+        }
+
+        .page-number.active {
+            background-color: #ffdf5f;
+        }
+
+
+         /* 대기화면 */
+        .waiting-screen {
+            position:fixed;
+            top:0;
+            left:0;
+            width:100vw;
+            height:100vh;
+            background-color: rgba(0,0,0,0.75);
+            display: none; /* 기본상태 숨김 (flex = 보이게)*/
+
+            /* 가운데 정렬 */
+            justify-content: center; 
+            align-items: center;
+
+            z-index:1000; /* 요소 우선순위 지정 높을 수록 제일 위 */
+         }
+        .waiting-screen-text{
+            color:#ffdf5f;
+            font-size: 80px;
+            font-weight:bold;
+            font-family: '배달의민족 주아', sans-serif;
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header>피트니스 아이템 검색기</header>
+
+    <form action="/search" method="GET">
+        <div class="search-wrapper">
+            <div class="icon" data-placeholder="전체 검색입니다" data-site="all">
+                <img src="{{ url_for('static', filename='/search_icon.png') }}">
+            </div>
+            <div class="icon" data-placeholder="몬스터짐 검색입니다" data-site="monster">
+                <img src="{{ url_for('static', filename='/icon_mz.jpg') }}">
+            </div>
+            <div class="icon" data-placeholder="미트리 검색입니다"  data-site="metree">
+                <img src="{{ url_for('static', filename='/metree_icon.jpg') }}">
+            </div>
+            <div class="icon" data-placeholder="헬스코리아 검색입니다" data-site="health">
+                <img src="{{ url_for('static', filename='/hk_icon.png') }}">
+            </div>
+
+            <input type="search" id="searchInput" name="searchInput" placeholder="검색어를 입력하세요" />
+            <input type="hidden" id="siteInput" name="site" value="all" data-site="all">
+        </div>
+    </form>
+    <div class="waiting-screen" id="waiting-screen">
+        <div class="waiting-screen-text">잠시만 기다려 주세요...</div>
+    </div>
+
+    <div class="product-row" id="product-row">
+        <!-- JavaScript로 상품 카드가 여기에 동적으로 삽입됨 -->
+    </div>
+
+    <div class="pagination" id="pagination">
+        <!-- JavaScript로 페이지 번호가 여기에 삽입됨 -->
+    </div>
+
+
+    <script>
+        // 아이콘들 선택
+        const icons = document.querySelectorAll('.icon');
+        const searchInput = document.getElementById('searchInput');
+        const siteInput = document.getElementById('siteInput');
+
+        icons.forEach(icon => {
+            icon.addEventListener('click', () => {
+                // 아이콘의 placeholder 값으로 변경
+                const newPlaceholder = icon.getAttribute('data-placeholder');
+
+                //site input값 변경
+                siteInput.value = icon.getAttribute('data-site');
+
+
+                searchInput.placeholder = newPlaceholder;
+                searchInput.focus(); // 검색창에 포커스로 바로 입력
+            });
+        });
+        
+        const products={{ productList | tojson | safe }}; //jinja 형식 
+        console.log(products);
+        const itemsPerPage = 5;  //한페이지 보여줄 카드 개수
+        let currentPage = 1; //현재 페이지
+
+        function renderProducts(page) {
+            const row = document.getElementById('product-row');
+            row.innerHTML = ''; // 기존 내용 제거
+
+            const start = (page - 1) * itemsPerPage; // ex) page=1 start=0, page=2 start=5
+            const end = start + itemsPerPage;
+            const items = products.slice(start, end); // 현재 페이지에 보여줄 상품 배열 자르기
+
+            items.forEach(item => { //for item in items  (python ver)
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <a href="${item.productLink}" class="product-card-link" target="_blank">
+                        <img src="${item.imageLink}" alt="${item.name}">
+                        <div class="product-name">${item.name}</div>
+                        <div class="product-price">₩${item.price}</div>
+                    </a>`;
+            
+                row.appendChild(card); //완성된 카드를 row안에 추가
+            });
+
+        }
+
+        function renderPagination() {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            const totalPages = Math.ceil(products.length / itemsPerPage);
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('div');
+                btn.className = 'page-number';
+                if (i === currentPage) {
+                    btn.className += ' active';
+                }
+
+                btn.innerText = i;
+
+                btn.onclick = function(){
+                    currentPage = i;
+                    renderProducts(currentPage);
+                    renderPagination();
+                };
+                pagination.appendChild(btn);
+            }
+        }
+
+        // 최초 실행
+        renderProducts(currentPage);
+        renderPagination();
+    </script>
+
+    <script>
+        const form = document.querySelector('form[action="/search"]');
+        const waitingScreen = document.getElementById('waiting-screen');
+
+        form.addEventListener('submit', () => {
+            waitingScreen.style.display = 'flex'; // 대기화면 보이기 (flex로 중앙정렬)
+        });
+    </script>
+
+    
+</body>
+
+</html>
